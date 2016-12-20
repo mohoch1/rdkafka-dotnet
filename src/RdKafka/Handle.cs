@@ -77,19 +77,26 @@ namespace RdKafka
 
         protected virtual void Dispose(bool disposing)
         {
-            callbackCts.Cancel();
-            callbackTask.Wait();
-
-            if (disposing)
+            try
             {
-                // Wait until all outstanding sends have completed
-                while (OutQueueLength > 0)
-                {
-                    handle.Poll((IntPtr) 100);
-                }
+                callbackCts.Cancel();
+                callbackTask.Wait();
 
-                handle.Dispose();
-            }
+                if (disposing)
+                {
+                    // Wait until all outstanding sends have completed
+                    while (OutQueueLength > 0)
+                    {
+                        handle.Poll((IntPtr) 100);
+                    }
+
+                    handle.Dispose();
+                }
+             }
+             catch
+             {
+                //do not throw exception from Dispose
+             }
         }
 
         /// <summary>
